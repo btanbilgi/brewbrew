@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class DefaultMoveScript : MonoBehaviour
+public class MovementController : MonoBehaviour
 {
-    public bool vertical = false;
-    public float verticalDistance = 5f;
-    public float verticalDuration = 2f;
+    [SerializeField] bool vertical = false;
+    [SerializeField] float verticalDistance = 5f;
+    [SerializeField] float verticalDuration = 2f;
 
-    public bool horizontal = true;
-    public float horizontalDistance = 5f;
-    public float horizontalDuration = 2f;
-    
-    public int startingDirection = 1;
+    [SerializeField] bool horizontal = true;
+    [SerializeField] float horizontalDistance = 5f;
+    [SerializeField] float horizontalDuration = 2f;
 
-    private GameManager gameManagerScript;
+    [SerializeField] int startingDirection = 1;
+
+    private GameManager gameManager;
     
     private Vector3 startPosition;
 
@@ -23,14 +23,14 @@ public class DefaultMoveScript : MonoBehaviour
 
     void Start()
     {
-        gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+        gameManager = GameManager.instance;
         startPosition = transform.position;
         StartMoving();
     }
 
     private void Update()
     {
-        if (gameManagerScript.IsPaused())
+        if (gameManager.IsPaused())
         {
             moveTween.Pause();
             return;

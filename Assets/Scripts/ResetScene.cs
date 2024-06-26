@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SceneResetter : MonoBehaviour
+public class ResetScene : MonoBehaviour
 {
-   
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            ResetScene();
+            Reset();
         }
     }
 
-    public void ResetScene()
+    public void Reset()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }

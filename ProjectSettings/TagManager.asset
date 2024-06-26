@@ -8,6 +8,7 @@ TagManager:
   - Sphere
   - Black
   - White
+  - Cube
   layers:
   - Default
   - TransparentFX

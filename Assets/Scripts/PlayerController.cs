@@ -92,17 +92,30 @@ public class PlayerController : MonoBehaviour
     public string sphereTag;
     
     public float moveSpeed = 1.5f;
-    public float scaleEndValue = 0;
+    [SerializeField] private float scaleEndValue = 0;
     public float scaleDuration = 3.0f;
+    bool scaleTargetSphereflag = true;
     GameObject targetSphere;
+
+    ScoreUpdater scoreUpdaterScript;
+    GameManager gameManagerScript;
+    DefaultMoveScript defaultMoveScript;
 
     void Start()
     {
         mainCamera = Camera.main; // Use Camera.main to find the main camera
+        scoreUpdaterScript = GameObject.Find("Score").GetComponent<ScoreUpdater>();
+        gameManagerScript = GameManager.instance;
+        defaultMoveScript = gameObject.GetComponent<DefaultMoveScript>();
     }
 
     void Update()
     {
+        if (gameManagerScript.IsPaused())
+        {
+            return;
+        }
+
         if (canClick && Input.GetMouseButtonDown(0))
         {
             // Raycast to detect which sphere is clicked
@@ -122,12 +135,17 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-
-        if (GameObject.FindGameObjectsWithTag(sphereTag).Length == 1)
+    
+        if (GameObject.FindGameObjectsWithTag(sphereTag).Length == 1 && scaleTargetSphereflag)
         {
-            targetSphere.transform.DOScale(scaleEndValue, scaleDuration);
-                //.OnComplete(() => DestroySphere(targetSphere))
+            scaleTargetSphere();
+            scaleTargetSphereflag = false;
         }
+    }
+
+    private void OnDestroy()
+    {
+
     }
 
     void MoveSpheresTowards(GameObject targetSphere)
@@ -135,10 +153,11 @@ public class PlayerController : MonoBehaviour
         //foreach (GameObject sphere in GameObject.FindGameObjectsWithTag(transform.tag))
         foreach (GameObject sphere in GameObject.FindGameObjectsWithTag(sphereTag))
         {
-            if (sphere == targetSphere) // Skip the sphere that was clicked
+            if (sphere == targetSphere) // the sphere that was clicked
             {
                 playerRb = sphere.GetComponent<Rigidbody>();
                 playerRb.constraints = RigidbodyConstraints.FreezePosition;
+                defaultMoveScript.moveTween.Kill();
             }
             else
             {
@@ -146,19 +165,25 @@ public class PlayerController : MonoBehaviour
                 sphere.transform.DOMove(targetSphere.transform.position, moveSpeed)
                     .SetEase(Ease.Linear)
                     .SetSpeedBased()
-                    .OnComplete(() => DestroySphere(sphere)); // Destroy the sphere after movement
-                    //.OnComplete(() => targetSphere.transform.DOScale(scaleEndValue, scaleDuration));
-                
+                    .OnComplete(() => 
+                    {
+                        DestroySphere(sphere);
+                    }); // Destroy the sphere after movement
             }
         }
     }
 
-    
+    void scaleTargetSphere()
+    {
+        targetSphere.transform.DOScale(scaleEndValue, scaleDuration)
+               .OnComplete(() => DestroySphere(targetSphere));
+    }
 
     void DestroySphere(GameObject sphere)
     {
         // Destroy or deactivate the sphere
         Destroy(sphere);
+        scoreUpdaterScript.scoreCount++;
         // Optionally, you can also instantiate a particle effect or perform other actions here
         // Instantiate(particleEffect, sphere.transform.position, Quaternion.identity);
     }

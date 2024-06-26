@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class SceneResetter : MonoBehaviour
 {
+   
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -15,7 +16,6 @@ public class SceneResetter : MonoBehaviour
 
     public void ResetScene()
     {
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
